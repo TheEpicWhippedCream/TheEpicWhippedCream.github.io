@@ -1,0 +1,129 @@
+#include <iostream>
+#include <fstream>
+#include <map>
+#include <string>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+#include <cstdlib>
+
+using namespace std;
+ofstream out("maze.game");
+
+bool activate=false;
+int n,m,v[200][200];
+int x,y;
+void maze(){
+    cout<<"Enter dimensions of the maze: "<<'\n';
+    cin>>n>>m;
+    cout<<'\n'<<"Do you want to activate HARD MODE ?"<<'\n';
+    char chr[20];
+    cin>>chr;
+    if((chr[0]=='y' || chr[0]=='Y') && (chr[1]=='e' || chr[1]=='E') && (chr[2]=='s' || chr[2]=='S'))
+        activate=true;
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=m;j++){
+            v[i][j]=rand()%2;
+        }
+    }
+    x=n/2+1;
+    y=m/2+1;
+    v[x][y]=0;
+}
+int life=3;
+bool e=false;
+void move(){
+    if(life>0){
+        char dir;
+        cin>>dir;
+        if(dir=='p' || dir=='P'){
+            if(activate==true)
+                v[x][y]=1;
+            life--;
+            char poz;
+            cin>>poz;
+            if(poz=='w' || poz=='W'){
+                x--;
+            }
+            if(poz=='a' || poz=='A'){
+                y--;
+            }
+            if(poz=='s' || poz=='S'){
+                x++;
+            }
+            if(poz=='d' || poz=='D'){
+                y++;
+            }
+            v[x][y]++;
+            v[x][y]%=2;
+        }
+        else{
+            if(activate==true)
+                v[x][y]=1;
+            if(dir=='w' || dir=='W'){
+                if(v[x-1][y]==0)
+                    x--;
+                else
+                    life--;
+            }
+            if(dir=='a' || dir=='A'){
+                if(v[x][y-1]==0)
+                    y--;
+                else
+                    life--;
+            }
+            if(dir=='s' || dir=='S'){
+                if(v[x+1][y]==0)
+                    x++;
+                else
+                    life--;
+            }
+            if(dir=='d' || dir=='D'){
+                if(v[x][y+1]==0)
+                    y++;
+                else
+                    life--;
+            }
+        }
+    }
+}
+
+void show_maze(){
+    cout<<'\n'<<'\n';
+    if(life>1){
+        cout<<"lives: "<<life<<'\n';
+    }
+    else{
+        cout<<"one more life!"<<'\n';
+    }
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=m;j++){
+            if(i==x && j==y)
+                cout<<"  ";
+            else
+                cout<<v[i][j]<<" ";
+        }
+        cout<<'\n';
+    }
+    cout<<'\n'<<'\n'<<'\n';
+}
+
+int main(){
+    srand((unsigned)time(NULL));
+    maze();
+    show_maze();
+    while(x!=0 && x!=n+1 && y!=0 && y!=m+1){
+        move();
+        if(life==0){
+            x=0;
+        }
+        show_maze();
+    }
+    if(life!=0){
+        cout<<"Great job! You got out of the maze!"<<'\n'<<'\n';
+    }
+    if(life==0){
+        cout<<"Game over!"<<'\n'<<'\n';
+    }
+    cout<<"Game made by TheEpicWipedCrea Studios, Thank you for playing!"<<'\n'<<'\n';
+}

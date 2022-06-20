@@ -1,0 +1,273 @@
+#include <iostream>
+#include <fstream>
+#include <map>
+#include <string>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+#include <cstdlib>
+
+using namespace std;
+
+int water;
+int n,m,v[102][102];
+void flood(int i,int j){
+    if(i>0 && i<=n && j>0 && j<=m){
+        if(v[i][j]==water){
+            if(v[i-1][j]<water){
+                v[i-1][j]=water;
+                flood(i-1,j);
+            }
+            if(v[i+1][j]<water){
+                v[i+1][j]=water;
+                flood(i+1,j);
+            }
+            if(v[i][j-1]<water){
+                v[i][j-1]=water;
+                flood(i,j-1);
+            }
+            if(v[i][j+1]<water){
+                v[i][j+1]=water;
+                flood(i,j+1);
+            }
+        }
+    }
+}
+
+void maps(){
+    cout<<'\n';
+    cout<<"    ";
+    for(int i=1;i<=m;i++){
+        cout<<i<<" ";
+    }
+    cout<<'\n'<<'\n';
+    for(int i=1;i<=n;i++){
+        if(i<10){
+            cout<<i<<"   ";
+        }
+        else{
+            if(i<100){
+                cout<<i<<"  ";
+            }
+            else{
+                cout<<" ";
+            }
+        }
+        for(int j=1;j<=m;j++){
+            if(v[i][j]==water){
+                char qqqqqq=176;
+                cout<<qqqqqq<<" ";
+            }
+            else{
+                if(v[i][j]==-1){
+                    char qqqqqq=15;
+                    cout<<qqqqqq<<" ";
+                }
+                else{
+                    cout<<v[i][j]<<" ";
+                }
+            }
+        }
+        cout<<'\n';
+    }
+    cout<<'\n';
+}
+
+void loading_bar(){
+    int i;
+    char v[]={"LOADING"};
+    cout<<"Loading project"<<'\n'<<'\n';
+    for(i=0;i<strlen(v);i++){
+        short int nr=rand();
+        nr%=2;
+        sleep(nr);
+        cout<<v[i];
+    }
+    for(i=0;i<3;i++){
+        short int nr=rand();
+        nr%=3;
+        nr++;
+        sleep(nr);
+        cout<<".";
+    }
+    cout<<'\n';
+    cout<<'\n'<<"All fully loaded"<<'\n';
+}
+
+int si,sj;
+int ssi,ssj;
+
+int main(){
+    // code for randomization
+    srand((unsigned)time(NULL));
+    loading_bar();
+    cout<<'\n'<<"Welcome to a state of the art flood game, you have to protect your rescue center (marked on the map with 'H') from flooding"<<'\n';
+    cout<<"But because this isn't a very good game... you should be careful of the wall's height to not be the water height, because it will register it as water..."<<'\n'<<"Well... have fun... i hope you will... so let's start:"<<'\n'<<'\n';
+    int type=rand()%4+1;
+    cout<<"Make sure your city dimensions are greater than 5x5"<<'\n';
+    cin>>n>>m;
+    cout<<'\n'<<"water level?"<<'\n';
+    cin>>water;
+    cout<<'\n';
+    bool sandbox=false;
+    cout<<"do you want to create your own city? (enable sandbox mode)"<<'\n';
+    string c;
+    cin>>c;
+    cout<<'\n';
+    if(c=="yes" || c=="Yes" || c=="yEs" || c=="yeS" || c=="YEs" || c=="YeS" || c=="yES" || c=="YES"){
+        sandbox=true;
+    }
+    if(sandbox==true){
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=m;j++){
+                cin>>v[i][j];
+            }
+        }
+    }
+    if(sandbox==false){
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=m;j++){
+                v[i][j]=rand()%(water+3);
+                if(v[i][j]==water){
+                    v[i][j]++;
+                }
+            }
+        }
+        if(type==1){
+            si=1,sj=1;
+            for(int i=1;i<=n/3+1;i++){
+                for(int j=1;j<=m-(m/3+1);j++){
+                    v[i][j]=water;
+                }
+            }
+        }
+        if(type==2){
+            si=n/2-2;
+            sj=m/2-2;
+            for(int i=n/2-1;i<=n/2+3;i++){
+                for(int j=m/2-1;j<=m/2+2;j++){
+                    v[i][j]=water;
+                }
+            }
+        }
+        if(type==3){
+            si=1;
+            sj=1;
+            for(int i=1;i<=n/5+1;i++){
+                for(int j=1;j<=m-(m/5+1);j++){
+                    v[i][j]=water;
+                }
+            }
+            ssi=n;
+            ssj=n;
+            for(int i=n;i>=n-(n/5+1);i--){
+                for(int j=n;j>=m-(m/5+1);j--){
+                    v[i][j]=water;
+                }
+            }
+        }
+        if(type==4){
+            si=1;
+            sj=1;
+            for(int i=1;i<=m/3;i++){
+                for(int j=1;j<=n;j++){
+                    v[j][i]=water;
+                }
+            }
+        }
+    }
+    cout<<'\n'<<"The City Map:"<<'\n'<<'\n';
+
+    maps();
+
+    int nr=rand()%n+1+m/5+water;
+
+    cout<<"Now let us start the game... "<<'\n'<<"Yow have "<<nr<<" walls which make your buildings by one level taller"<<'\n';
+    cout<<"But first, you have to choose a "<<n/2-2<<" x "<<m/2-2<<" for your evacuation center"<<'\n';
+    cout<<"To place it somewhere it must be on LAND, and you have to type the NORTH-WEST coordinates"<<'\n';
+    cout<<"The goal of this game is for you to try to keep the people safe"<<'\n'<<"And try not to just put it in an opposite corner and hope for the best"<<'\n'<<"Because you need to keep as many sectors dry, GOOD LUCK!"<<'\n'<<'\n';
+
+    int x,y;
+    cin>>x>>y;
+    int cx=x,cy=y;
+    for(int i=x;i<=x+n/2-3;i++){
+        for(int j=y;j<=y+m/2-3;j++){
+            v[i][j]=-1;
+        }
+    }
+    cout<<'\n'<<'\n';
+
+    maps();
+    bool exiti=false;
+    cout<<"If you want to stop adding walls, you can say '0 0'"<<'\n'<<"But be careful if you add walls until the height is the water's height it will turn into water, if you raise it by one more level it turs back in a wall"<<'\n'<<"This add-on was made so that you will pay attention"<<'\n'<<'\n'<<'\n';
+    while(nr>0 && exiti==false){
+        cin>>x>>y;
+        if(x==0 && y==0)
+            exiti=true;
+        else{
+            cout<<'\n'<<nr<<'\n';
+            v[x][y]++;
+            maps();
+            nr--;
+        }
+    }
+
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=m;j++){
+            if(v[i][j]==water)
+                flood(i,j);
+        }
+    }
+
+    cout<<'\n'<<'\n'<<'\n'<<'\n';
+    cout<<'\n';
+    cout<<"    ";
+    int sect=0;
+    for(int i=1;i<=m;i++){
+        cout<<i<<" ";
+    }
+    cout<<'\n'<<'\n';
+    for(int i=1;i<=n;i++){
+        if(i<10){
+            cout<<i<<"   ";
+        }
+        else{
+            if(i<100){
+                cout<<i<<"  ";
+            }
+            else{
+                cout<<" ";
+            }
+        }
+        for(int j=1;j<=m;j++){
+            if(v[i][j]==water){
+                char qqqqqq=176;
+                cout<<qqqqqq<<" ";
+            }
+            else{
+                if(v[i][j]==-1){
+                    char qqqqqq=15;
+                    cout<<qqqqqq<<" ";
+                }
+                else{
+                    sect++;
+                    char qqqqqq=178;
+                    cout<<qqqqqq<<" ";
+                }
+            }
+        }
+        cout<<'\n';
+    }
+    cout<<'\n';
+    int nrin=0;
+    if(v[cx][cy]!=-1){
+        cout<<"You failed... Everyone drowned"<<'\n';
+        cout<<10*sect<<" Points"<<'\n';
+    }
+    else{
+        cout<<"Great job! Everyone is safe!"<<" and there are "<<sect<<" sectors that weren't touched by the water!"<<'\n';
+        cout<<"Which means you earned "<<100+10*sect+25*nr<<" points"<<'\n';
+    }
+    cout<<'\n'<<'\n';
+    cout<<"Game made by TheEpicWipedCrea Studios, Thank you for playing!"<<'\n'<<'\n';
+}
