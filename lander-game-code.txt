@@ -1,0 +1,193 @@
+#include <bits/stdc++.h>
+#include <conio.h>
+#include <chrono>
+#include <unistd.h>
+
+using namespace std;
+
+const char rock=219,lander=177,lander_crash=232;
+const int down[15]={0,1,1,1,2,2,2,3,3,5};
+int g_pull=0;
+int hmap[20]={0,0,0,0,0,0};
+int h,vel,rel_h,d_pos;
+bool land=false,crash=false;
+int dist;
+int viz=9;
+
+const int time_load=50;
+
+void true_radom(){
+    srand((unsigned)time(NULL));
+}
+void read(){
+    int ch;
+    ch=getch();
+    if(ch==224){
+        ch=getch();
+        if(ch==72){
+            //UP
+            if(g_pull==0 && d_pos==0){
+                h++;
+            }
+            else{
+                d_pos=0;
+                g_pull-=2;
+                if(g_pull<0){
+                    g_pull=0;
+                }
+                h-=g_pull;
+            }
+        }
+        else if(ch==80){
+            //DOWN
+            vel++;
+            g_pull+=down[d_pos];
+            h-=g_pull;
+            if(d_pos+1<=9){
+                d_pos++;
+            }
+        }
+        else if(ch==75){
+            //BACK
+            vel--;
+            g_pull+=down[d_pos];
+            h-=g_pull;
+            if(d_pos+2<=9){
+                d_pos+=2;
+            }
+        }
+        else{
+            vel++;
+            g_pull+=down[d_pos];
+            h-=g_pull;
+            if(d_pos+2<=9){
+                d_pos+=2;
+            }
+        }
+    }
+}
+
+void movement(){
+    dist+=vel;
+    if(vel>=viz){
+        for(int i=1;i<vel-viz;i++){
+            if(h<=rand()%6){
+                crash=true;
+            }
+        }
+        for(int i=0;i<viz;i++){
+            hmap[i]=rand()%6;
+            if(h<=hmap[i]){
+                crash=true;
+            }
+        }
+    }
+    else{
+        for(int i=0;i<vel;i++){
+            hmap[i]=hmap[i+vel];
+            if(h<=hmap[i]){
+                crash=true;
+            }
+        }
+        for(int i=viz-vel;i<viz;i++){
+            hmap[i]=rand()%6;
+            if(h<=hmap[i]){
+                crash=true;
+            }
+        }
+    }
+}
+
+void show_map(){
+    system("CLS");
+    cout<<lander;
+    for(int i=1;i<=viz;i++){
+        cout<<"-";
+    }
+    cout<<h<<'\n';
+    for(int hi=h-1;hi>=0;hi--){
+        for(int i=0;i<viz;i++){
+            if(hi<=6){
+                usleep(time_load);
+            }
+            if(hmap[i]>=hi){
+                cout<<rock;
+            }
+            else{
+                cout<<" ";
+            }
+        }
+        cout<<"-"<<hi<<'\n';
+    }
+    cout<<'\n';
+    cout<<"surface relative velocity: "<<vel<<'\n';
+    cout<<"surface relative height: "<<rel_h<<'\n';
+    cout<<"gravitational acceleration: "<<g_pull<<'\n';
+    cout<<"Distance covered: "<<dist<<'\n';
+    cout<<'\n';
+}
+
+int main(){
+    true_radom();
+    h=rand()%30,vel=rand()%4+1;;
+    if(h<=12){
+        h+=11;
+    }
+    rel_h=h;
+    while(rel_h>1 && crash==false){
+        show_map();
+        read();
+        movement();
+        rel_h=h-hmap[0];
+        if(rel_h==1){
+            if(vel<=2 && g_pull<=3){
+                land=true;
+            }
+            else{
+                crash=true;
+            }
+        }
+    }
+    if(h<=hmap[0]){
+        h=hmap[0]+1;
+    }
+    system("CLS");
+    if(crash==true){
+        for(int hi=6;hi>=0;hi--){
+            for(int i=0;i<viz;i++){
+                usleep(time_load+25);
+                if(hi==h && i==0){
+                    cout<<lander_crash;
+                }
+                else if(hmap[i]>=hi){
+                    cout<<rock;
+                }
+                else{
+                    cout<<" ";
+                }
+            }
+            cout<<'\n';
+        }
+        cout<<"FAIL!";
+    }
+    else{
+        for(int hi=6;hi>=0;hi--){
+            for(int i=0;i<viz;i++){
+                usleep(time_load+50);
+                if(hi==h && i==0){
+                    cout<<lander_crash;
+                }
+                else if(hmap[i]>=hi){
+                    cout<<rock;
+                }
+                else{
+                    cout<<" ";
+                }
+            }
+            cout<<'\n';
+        }
+        cout<<"That's one small step for (a) man, one giant leap for mankind. Well done!";
+    }
+
+    return 0;
+}
