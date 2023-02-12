@@ -1,0 +1,263 @@
+#include <bits/stdc++.h>
+#include <windows.h>
+#include <unistd.h>
+#include <chrono>
+#include <conio.h>
+#include <stdlib.h>
+#include <time.h>
+
+using namespace std;
+
+HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+
+int table[6+1][7+1];
+int hmap[7+1];
+
+int player,difficulty;
+int ai;
+
+char wall=179;
+char tlcorner=218;
+char blcorner=192;
+char trcorner=191;
+char brcorner=217;
+char border_1=196;
+char border_2=194;
+char border_3=193;
+
+char blank=' ';
+char player_icon='O';
+
+#define RED 4
+#define YELLOW 6
+#define WHITE 7
+
+int turn;
+int noPlayer=0;
+int OptimalPlayer=0;
+int noAi=0;
+int OptimalAi=0;
+
+int WON;
+
+
+void start();
+void play();
+void show_table();
+void take_input();
+void check_win();
+void finish();
+
+int main(){
+    srand(time(NULL));
+    int OptimalAi=rand()%7;
+    //start();
+    player=1;
+    ai=2;
+    difficulty=1;
+    play();
+}
+
+void start(){
+    string response;
+    cout<<"Let's play a little game!"<<'\n'<<"Do you what to start?"<<'\n';
+    cin>>response;
+    if(response=="yes"){
+        player=1;
+        ai=2;
+    }
+    else{
+        player=2;
+        ai=1;
+    }
+    cout<<"What difficulty do you want to play? Easy or Hard?"<<'\n';
+    cin>>response;
+    if(response=="Easy" || response=="easy"){
+        difficulty=1;
+    }
+    else{
+        difficulty=2;
+    }
+    system("CLS");
+    cout<<"Great! Let's start!";
+    sleep(1);
+    system("CLS");
+}
+
+void show_table(){
+    for(int i=1;i<=7;i++){
+        cout<<" "<<i;
+    }
+    cout<<'\n';
+
+    cout<<tlcorner;
+    for(int i=1;i<=13;i++){
+        if(i%2==1){
+            cout<<border_1;
+        }
+        else{
+            cout<<border_2;
+        }
+    }
+    cout<<trcorner<<'\n';
+    for(int i=1;i<=6;i++){
+        cout<<wall;
+        for(int j=1;j<=7;j++){
+            if(table[i][j]==0){
+                cout<<blank;
+            }
+            else if(table[i][j]==1){
+                SetConsoleTextAttribute(console,RED);
+                cout<<player_icon;
+                SetConsoleTextAttribute(console,WHITE);
+            }
+            else{
+                SetConsoleTextAttribute(console,YELLOW);
+                cout<<player_icon;
+                SetConsoleTextAttribute(console,WHITE);
+            }
+            cout<<wall;
+        }
+        cout<<'\n';
+    }
+    cout<<blcorner;
+    for(int i=1;i<=13;i++){
+        if(i%2==1){
+            cout<<border_1;
+        }
+        else{
+            cout<<border_3;
+        }
+    }
+    cout<<brcorner<<'\n';
+}
+
+void take_input(){
+    cout<<'\n'<<"What collumn do you want to drop your coin into?"<<'\n';
+
+    int col;
+    cin>>col;
+    while(hmap[col]==6){
+        cout<<"Line is full! Try another one!"<<'\n';
+        cin>>col;
+    }
+    while(col<1 && col>6){
+        cout<<"Invalid collumn! Try another one!"<<'\n';
+        cin>>col;
+    }
+    hmap[col]++;
+    table[7-hmap[col]][col]=player;
+}
+
+
+void check_win(){
+    int len_player=0;
+    int len_ai=0;
+    for(int i=1;i<=6;i++){
+        for(int j=1;j<=7;j++){
+            if(len_player==4){
+                WON=player;
+            }
+            if(table[i][j]==player){
+                len_player++;
+            }
+            else{
+                len_player=0;
+            }
+        }
+        if(len_player==4){
+            WON=player;
+        }
+    }
+    for(int j=1;j<=7;j++){
+        for(int i=1;i<=6;i++){
+            if(len_player==4){
+                WON=player;
+            }
+            if(table[i][j]==player){
+                len_player++;
+            }
+            else{
+                len_player=0;
+            }
+        }
+        if(len_player==4){
+            WON=player;
+        }
+    }
+
+    for(int i=1;i<=6;i++){
+        for(int j=1;j<=7;j++){
+            if(len_ai==4){
+                WON=ai;
+            }
+            if(table[i][j]==ai){
+                len_ai++;
+            }
+            else{
+                len_ai=0;
+            }
+        }
+        if(len_ai==4){
+            WON=ai;
+        }
+    }
+    for(int j=1;j<=7;j++){
+        for(int i=1;i<=6;i++){
+            if(len_ai==4){
+                WON=ai;
+            }
+            if(table[i][j]==ai){
+                len_ai++;
+            }
+            else{
+                len_ai=0;
+            }
+        }
+        if(len_ai==4){
+            WON=ai;
+        }
+    }
+}
+
+
+void finish(){
+    system("CLS");
+    show_table();
+    if(WON==player){
+        cout<<"Great job! You won!";
+    }
+    else{
+        cout<<"Unlucky!";
+    }
+}
+
+void play(){
+    show_table();
+    if(turn%2+1==player){
+        take_input();
+    }
+    else{
+        if(difficulty==1){
+            int position=rand()%7+1;
+            hmap[position]++;
+            table[7-hmap[position]][position]=ai;
+        }
+        else{
+            //complicated
+        }
+    }
+
+    sleep(1);
+
+    check_win();
+
+    if(WON!=0){
+        finish();
+        return;
+    }
+
+    system("CLS");
+    turn++;
+    play();
+}
