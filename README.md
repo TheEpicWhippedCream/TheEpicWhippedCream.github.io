@@ -1,3 +1,3 @@
 i hate this
 
-TheEpicWhippedCream.github.io
+https://TheEpicWhippedCream.github.io
